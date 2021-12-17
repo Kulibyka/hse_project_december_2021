@@ -514,7 +514,7 @@ class Player(pygame.sprite.Sprite):
 
 level = 1
 running = True
-fon = pygame.transform.scale(load_image('backgrounds/background_1.jpg'), (width, height))
+fon = pygame.transform.scale(load_image('backgrounds/background.jpg'), (width, height))
 start_screen()
 boy = Player(fire_player, 'fire_p', water_sprite, 30, 30, 'live_fire', 170, 550)
 girl = Player(water_player, 'water_p', lava_sprite, 1200, 30, 'live_water', 220, 550)
