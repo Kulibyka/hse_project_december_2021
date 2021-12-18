@@ -2,6 +2,7 @@ import game
 import pygame
 import unittest
 
+
 class GameTests(unittest.TestCase):
     def test_lose_health(self):
         """
@@ -9,7 +10,7 @@ class GameTests(unittest.TestCase):
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 270, 550)
         water = game.Liquid(270, 550, ['water', 'water_reverse'], game.water_sprite)
@@ -24,7 +25,7 @@ class GameTests(unittest.TestCase):
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 370, 550)
         fire = game.Liquid(370, 550, ['lava', 'lava_reverse'], game.lava_sprite)
@@ -33,14 +34,13 @@ class GameTests(unittest.TestCase):
         after = boy.lives
         assert after == before
 
-
     def test_can_move(self):
         """
         Проверяем что персоонаж может перемещаться в пространстве (в частности по оси x)
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 270, 550)
         coord = boy.rect.topleft
@@ -55,7 +55,7 @@ class GameTests(unittest.TestCase):
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 270, 550)
         block_to_stand = game.Block(boy.rect.left, boy.rect.bottom, 'mud', game.blocks_group)
@@ -72,7 +72,7 @@ class GameTests(unittest.TestCase):
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 270, 550)
         water = game.Liquid(270, 550, ['water', 'water_reverse'], game.water_sprite)
@@ -86,7 +86,7 @@ class GameTests(unittest.TestCase):
         :return:
         """
         size = width, height = 1280, 720
-        screen = pygame.display.set_mode(size)
+        screen = pygame.display.set_mode(size, flags=pygame.HIDDEN)
         screen.fill((0, 0, 255))
         boy = game.Player(game.fire_player, 'fire_p', game.water_sprite, 30, 30, 'live_fire', 270, 550)
         key = game.Key(270, 550, 'red_key', game.fire_key)
