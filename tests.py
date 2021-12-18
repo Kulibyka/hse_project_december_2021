@@ -3,8 +3,7 @@ import pygame
 import unittest
 
 class GameTests(unittest.TestCase):
-
-def test_lose_health(self):
+    def test_lose_health(self):
         """
         Проверяем что при соприкосновении персонажа с противоположной стихией он теряет здоровье
         :return:
