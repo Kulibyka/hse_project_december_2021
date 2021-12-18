@@ -2,13 +2,7 @@ import os
 import sys
 import pygame
 
-size = width, height = 1280, 720
-screen = pygame.display.set_mode(size)
-screen.fill((0, 0, 255))
-FPS = 60
-clock = pygame.time.Clock()
 pygame.init()
-
 hidden_group = pygame.sprite.Group()
 fire_exit = pygame.sprite.Group()
 water_exit = pygame.sprite.Group()
@@ -30,7 +24,7 @@ def load_image(name, colorkey=None):
     """
     функция создани яотносительного пути файла, проверки его существования и загрузки изображения
     :param name: путь к фалу из папки data
-    :param colorkey:
+    :param colorkey: параметр прозрачности изображения
     :return: изображение
     """
     fullname = os.path.join('data', name)
@@ -227,12 +221,12 @@ def win_game():
         clock.tick(FPS)
 
 
-def check_lose():
+def check_lose(boy_hp, girl_hp):
     """
     функция для проверки поражения игрока
     :return: результат проверки
     """
-    if boy.lives == 0 or girl.lives == 0:
+    if boy_hp <= 0 or girl_hp <= 0:
         return True
     return False
 
@@ -269,6 +263,13 @@ def looser():
 
 
 class Block(pygame.sprite.Sprite):
+    """
+    Класс обычного блока, используется для передвижения персонада по уровню
+    имеет такие поля:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    """
+
     def __init__(self, x, y, specious, group):
         """
         функция инициализации класса
@@ -283,6 +284,16 @@ class Block(pygame.sprite.Sprite):
 
 
 class SpecialBlock(pygame.sprite.Sprite):
+    """
+    Класс специального блока, который реагирует только на персолнажа своей стихии
+    имеет такие поля:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    self.collided - маркер для проверки соприкосновения с персонажем и смены спрайта
+    self.checker - используется для отслеживания состояния блока
+    self.require_player - содержит тип игрока который необходим для взаимодействия с этим блоком
+    """
+
     def __init__(self, x, y, set_of_frames, groups):
         """
         функция инициализации класса
@@ -335,6 +346,14 @@ class SpecialBlock(pygame.sprite.Sprite):
 
 
 class HiddenBlock(pygame.sprite.Sprite):
+    """
+    Класс скрытого блока, который появляется при нажатии на специальный блок
+    имеет такие поля:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    self.visible - маркер для проверки видимости блока
+    """
+
     def __init__(self, x, y, set_of_frames, group):
         """
         функция инициализации класса
@@ -359,6 +378,14 @@ class HiddenBlock(pygame.sprite.Sprite):
 
 
 class Key(pygame.sprite.Sprite):
+    """
+    Класс ключа, который необходимо найти, чтобы закончить игру
+    Parameters:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    self.type - вид ключа (огонь или вода)
+    """
+
     def __init__(self, x, y, frame, group):
         """
         функция инициализации класса
@@ -375,6 +402,13 @@ class Key(pygame.sprite.Sprite):
 
 
 class Exit(pygame.sprite.Sprite):
+    """
+    Класс выхода, до которого персонаж должен добраться имея ключ
+    Parameters:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    """
+
     def __init__(self, x, y, frame, group):
         """
         функция инициализации класса
@@ -389,6 +423,13 @@ class Exit(pygame.sprite.Sprite):
 
 
 class Liquid(pygame.sprite.Sprite):
+    """
+    Класс анимированной жидкости, взаимодействет с персонажам противоположной стихии, убивая его
+    Parameters:
+    self.image - спрайт жидкости
+    self.rect - прямоугольник в котором находится спрайт
+    """
+
     def __init__(self, x, y, set_of_frames: list, group):
         """
         функция инициализации класса
@@ -416,6 +457,25 @@ class Liquid(pygame.sprite.Sprite):
 
 
 class Player(pygame.sprite.Sprite):
+    """
+    Класс игрового персонажа, является основным классом который взаимодействет со всеми элементами игры
+    Parameters:
+    self.image - спрайт персонажа
+    self.life - спрайт жизни
+    self.count - количество скрытых блоков
+    self.exit - маркер для проверки что подошёл к выходу
+    self.start - координаты спавна персонажа
+    self.rect - прямоугольник в котором находится спрайт
+    self.speed - скорость персонажа по осям
+    self.gravity - сила гравитации
+    self.lives - количество здоровья
+    self.find_key - маркер для проверки что ключ был наёден
+    self.issue - уяхвимость
+    self.is_jump - маркер для проверки состояния прыжка
+    self.on_air - маркер дл япроверки состояния свободного падения
+    self.check_hidden - список для проверки видимости скрытых блоков
+    """
+
     def __init__(self, player_type, player_look, issue, x_h, y_h, life, x, y):
         """
         функция инициализации класса
@@ -509,56 +569,62 @@ class Player(pygame.sprite.Sprite):
             self.rect.topleft = self.start
 
 
-level = 1
-running = True
-fon = pygame.transform.scale(load_image('backgrounds/background.jpg'), (width, height))
-start_screen()
-boy = Player(fire_player, 'fire_p', water_sprite, 30, 30, 'live_fire', 170, 550)
-girl = Player(water_player, 'water_p', lava_sprite, 1200, 30, 'live_water', 220, 550)
-next_lvl(level)
-while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_RIGHT:
-                boy.speed[0] += 4
-            if event.key == pygame.K_LEFT:
-                boy.speed[0] -= 4
-            if event.key == pygame.K_UP and not boy.is_jump:
-                boy.is_jump = True
-            if event.key == pygame.K_d:
-                girl.speed[0] += 4
-            if event.key == pygame.K_a:
-                girl.speed[0] -= 4
-            if event.key == pygame.K_w and not boy.is_jump:
-                girl.is_jump = True
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_RIGHT:
-                boy.speed[0] -= 4
-            if event.key == pygame.K_LEFT:
-                boy.speed[0] += 4
-            if event.key == pygame.K_UP:
-                boy.is_jump = False
-            if event.key == pygame.K_d:
-                girl.speed[0] -= 4
-            if event.key == pygame.K_a:
-                girl.speed[0] += 4
-            if event.key == pygame.K_w:
-                girl.is_jump = False
-    screen.blit(fon, (0, 0))
-    animated_sprites.update()
-    fire_exit.draw(screen)
-    water_exit.draw(screen)
-    boy.health()
-    girl.health()
-    animated_sprites.draw(screen)
-    blocks_group.draw(screen)
-    pygame.display.flip()
-    clock.tick(FPS)
-    if check_win():
-        win_game()
-        terminate()
-    if check_lose():
-        looser()
-        terminate()
+if __name__ == '__main__':
+    size = width, height = 1280, 720
+    screen = pygame.display.set_mode(size)
+    screen.fill((0, 0, 255))
+    FPS = 60
+    clock = pygame.time.Clock()
+    level = 1
+    running = True
+    fon = pygame.transform.scale(load_image('backgrounds/background.jpg'), (width, height))
+    start_screen()
+    boy = Player(fire_player, 'fire_p', water_sprite, 30, 30, 'live_fire', 170, 550)
+    girl = Player(water_player, 'water_p', lava_sprite, 1200, 30, 'live_water', 220, 550)
+    next_lvl(level)
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    boy.speed[0] += 4
+                if event.key == pygame.K_LEFT:
+                    boy.speed[0] -= 4
+                if event.key == pygame.K_UP and not boy.is_jump:
+                    boy.is_jump = True
+                if event.key == pygame.K_d:
+                    girl.speed[0] += 4
+                if event.key == pygame.K_a:
+                    girl.speed[0] -= 4
+                if event.key == pygame.K_w and not boy.is_jump:
+                    girl.is_jump = True
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_RIGHT:
+                    boy.speed[0] -= 4
+                if event.key == pygame.K_LEFT:
+                    boy.speed[0] += 4
+                if event.key == pygame.K_UP:
+                    boy.is_jump = False
+                if event.key == pygame.K_d:
+                    girl.speed[0] -= 4
+                if event.key == pygame.K_a:
+                    girl.speed[0] += 4
+                if event.key == pygame.K_w:
+                    girl.is_jump = False
+        screen.blit(fon, (0, 0))
+        animated_sprites.update()
+        fire_exit.draw(screen)
+        water_exit.draw(screen)
+        boy.health()
+        girl.health()
+        animated_sprites.draw(screen)
+        blocks_group.draw(screen)
+        pygame.display.flip()
+        clock.tick(FPS)
+        if check_win():
+            win_game()
+            terminate()
+        if check_lose(boy.lives, girl.lives):
+            looser()
+            terminate()
